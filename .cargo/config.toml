@@ -1,0 +1,5 @@
+[env]
+PKG_CONFIG_PATH = "/home/paulc/dbus-dev/pkgconfig"
+
+[build]
+rustflags = ["-L/home/paulc/dbus-dev/lib"]

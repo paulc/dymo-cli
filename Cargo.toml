@@ -1,0 +1,25 @@
+[package]
+name = "dymo-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "dymo-cli"
+path = "src/main.rs"
+
+[dependencies]
+argh             = "0.1"
+btleplug         = "0.12"
+tokio            = { version = "1", features = ["full"] }
+axum             = "0.7"
+image            = { version = "0.25", default-features = false, features = ["png"] }
+ab_glyph         = "0.2"
+ureq             = { version = "2", features = ["tls"] }
+futures          = "0.3"
+uuid             = "1"
+serde            = { version = "1", features = ["derive"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dymo LT-200B</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #4f8ef7;
+    --accent-dim: #3a6bc4;
+    --text: #e4e8f7;
+    --text-dim: #7a84aa;
+    --success: #3ecf8e;
+    --error: #f76f72;
+    --radius: 8px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  header svg { flex-shrink: 0; }
+
+  header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+
+  header .subtitle {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    background: var(--bg);
+  }
+
+  /* Form elements */
+  fieldset {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  legend {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 6px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .field { margin-top: 12px; }
+  .field:first-child { margin-top: 0; }
+
+  input[type=text], select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 7px 10px;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  input[type=text]:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .range-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .range-row span {
+    min-width: 36px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  input[type=checkbox] {
+    accent-color: var(--accent);
+    width: 14px;
+    height: 14px;
+  }
+
+  .line-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .line-tab {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font: inherit;
+    font-size: 12px;
+    padding: 5px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .line-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .text-inputs { display: flex; flex-direction: column; gap: 6px; }
+
+  /* Printer bar */
+  .printer-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .printer-bar select { flex: 1; }
+
+  /* Buttons */
+  button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    padding: 8px 16px;
+    transition: all .15s;
+  }
+
+  .btn-icon {
+    background: var(--surface2);
+    color: var(--text-dim);
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+  }
+
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .btn-primary:hover { background: var(--accent-dim); }
+  .btn-primary:disabled { opacity: .5; cursor: default; }
+
+  /* Preview */
+  .label-wrap {
+    background: #fff;
+    border-radius: 4px;
+    padding: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .label-tape {
+    background: #f5f0e8;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1px solid #d4c9a8;
+  }
+
+  .label-tape img {
+    display: block;
+    image-rendering: auto;
+    max-width: min(680px, 100%);
+    height: auto;
+  }
+
+  .label-tape .placeholder {
+    color: #bbb;
+    font-size: 13px;
+    padding: 20px 40px;
+    text-align: center;
+  }
+
+  .label-dims {
+    font-size: 11px;
+    color: #888;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all .2s;
+    pointer-events: none;
+    max-width: 320px;
+  }
+
+  .toast.show { opacity: 1; transform: none; pointer-events: auto; }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--error); color: var(--error); }
+
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  .status-dot.ok { background: var(--success); }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <rect width="28" height="28" rx="6" fill="#4f8ef7"/>
+    <rect x="5" y="10" width="18" height="8" rx="2" fill="white" opacity=".9"/>
+    <rect x="7" y="12" width="14" height="4" rx="1" fill="#4f8ef7"/>
+  </svg>
+  <div>
+    <h1>Dymo LT-200B</h1>
+    <div class="subtitle">Label Printer Interface</div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- Left panel: controls -->
+  <div class="panel">
+
+    <!-- Printer selection -->
+    <fieldset>
+      <legend>Printer</legend>
+      <div class="printer-bar">
+        <div class="status-dot" id="dot"></div>
+        <select id="printerSelect">
+          <option value="">— scan for printers —</option>
+        </select>
+        <button class="btn-icon" id="scanBtn" title="Scan for printers">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm0 1.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z" opacity=".4"/>
+            <path d="M8 4.5A3.5 3.5 0 0 1 11.5 8h1.5A5 5 0 0 0 8 3V4.5z">
+              <animateTransform id="scanAnim" attributeName="transform" type="rotate"
+                from="0 8 8" to="360 8 8" dur=".8s" repeatCount="indefinite" begin="indefinite"/>
+            </path>
+          </svg>
+        </button>
+      </div>
+    </fieldset>
+
+    <!-- Content -->
+    <fieldset>
+      <legend>Content</legend>
+
+      <div class="line-tabs">
+        <button class="line-tab active" data-lines="1">1 Line</button>
+        <button class="line-tab" data-lines="2">2 Lines</button>
+        <button class="line-tab" data-lines="3">3 Lines</button>
+        <button class="line-tab" data-lines="image">Image</button>
+      </div>
+
+      <div class="text-inputs" id="textInputs">
+        <input type="text" id="line1" placeholder="Text line 1" autocomplete="off">
+        <input type="text" id="line2" placeholder="Text line 2" style="display:none">
+        <input type="text" id="line3" placeholder="Text line 3" style="display:none">
+      </div>
+
+      <div id="imageInput" style="display:none" class="field">
+        <label>Image file path or URL</label>
+        <input type="text" id="imageUrl" placeholder="./logo.png or https://…">
+      </div>
+    </fieldset>
+
+    <!-- Typography -->
+    <fieldset id="typoFieldset">
+      <legend>Typography</legend>
+
+      <div class="field">
+        <label>Font</label>
+        <select id="fontSelect">
+          <option value="roboto">Roboto</option>
+          <option value="roboto-mono">Roboto Mono</option>
+          <option value="routed-gothic">Routed Gothic</option>
+          <option value="routed-gothic-narrow">Routed Gothic Narrow</option>
+          <option value="routed-gothic-wide">Routed Gothic Wide</option>
+        </select>
+      </div>
+
+      <div class="field" id="weightField">
+        <label>Weight <span id="weightLabel">400</span></label>
+        <div class="range-row">
+          <span>100</span>
+          <input type="range" id="weightRange" min="100" max="900" step="100" value="400">
+          <span>900</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Size (px, blank = auto)</label>
+        <input type="text" id="sizeInput" placeholder="auto" style="width:80px">
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="italicCheck"> Italic
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="invertCheck"> Invert (white on black)
+      </label>
+    </fieldset>
+
+    <!-- Actions -->
+    <button class="btn-primary" id="printBtn" disabled>
+      Print Label
+    </button>
+  </div>
+
+  <!-- Right: preview -->
+  <div class="preview-area">
+    <div class="label-wrap">
+      <div class="label-tape" id="labelTape">
+        <div class="placeholder" id="previewPlaceholder">
+          Enter text or select an image to preview
+        </div>
+        <img id="previewImg" style="display:none" alt="Label preview">
+      </div>
+      <div class="label-dims" id="labelDims"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// State
+let lineMode = 1;
+let debounceTimer = null;
+let imageMode = false;
+
+// --- Line mode tabs ---
+document.querySelectorAll('.line-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.line-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const val = btn.dataset.lines;
+    imageMode = val === 'image';
+    lineMode = imageMode ? 1 : parseInt(val);
+
+    $('textInputs').style.display = imageMode ? 'none' : '';
+    $('imageInput').style.display = imageMode ? '' : '';
+    $('typoFieldset').style.display = imageMode ? 'none' : '';
+
+    $('line2').style.display = lineMode >= 2 ? '' : 'none';
+    $('line3').style.display = lineMode >= 3 ? '' : 'none';
+
+    schedulePreview();
+  });
+});
+
+// --- Weight slider ---
+$('weightRange').addEventListener('input', () => {
+  $('weightLabel').textContent = $('weightRange').value;
+  schedulePreview();
+});
+
+// Disable weight for Routed Gothic (no variable font)
+$('fontSelect').addEventListener('change', () => {
+  const rg = $('fontSelect').value.startsWith('routed');
+  $('weightField').style.opacity = rg ? '.4' : '1';
+  $('weightRange').disabled = rg;
+  schedulePreview();
+});
+
+// --- Input events ---
+['line1','line2','line3','imageUrl'].forEach(id => {
+  $(id).addEventListener('input', schedulePreview);
+});
+
+['italicCheck','invertCheck'].forEach(id => {
+  $(id).addEventListener('change', schedulePreview);
+});
+
+$('sizeInput').addEventListener('input', schedulePreview);
+
+// --- Preview ---
+function schedulePreview() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(updatePreview, 280);
+}
+
+async function updatePreview() {
+  const req = buildRequest();
+  if (!hasContent(req)) {
+    $('previewImg').style.display = 'none';
+    $('previewPlaceholder').style.display = '';
+    $('labelDims').textContent = '';
+    return;
+  }
+
+  try {
+    const resp = await fetch('/api/preview', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(req),
+    });
+    if (!resp.ok) return;
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const img = $('previewImg');
+    img.onload = () => {
+      // naturalWidth / 8 = label pixel columns (before print 2× stretch)
+      // at 200 DPI with 2× stretch: effective mm = (cols * 2 / 200) * 25.4
+      const cols = img.naturalWidth / 8;
+      const mm = ((cols * 2) / 200 * 25.4).toFixed(1);
+      $('labelDims').textContent = `≈ ${mm} mm × 12 mm`;
+    };
+    img.src = url;
+    img.style.display = '';
+    $('previewPlaceholder').style.display = 'none';
+  } catch (e) { /* ignore network errors during typing */ }
+}
+
+// --- Scan ---
+$('scanBtn').addEventListener('click', async () => {
+  const anim = document.getElementById('scanAnim');
+  anim.beginElement();
+  $('scanBtn').disabled = true;
+
+  try {
+    const resp = await fetch('/api/scan');
+    const data = await resp.json();
+    const sel = $('printerSelect');
+    sel.innerHTML = '';
+
+    if (data.printers.length === 0) {
+      sel.innerHTML = '<option value="">No printers found</option>';
+      $('dot').className = 'status-dot';
+    } else {
+      data.printers.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.address;
+        opt.textContent = `${p.name} (${p.address})`;
+        sel.appendChild(opt);
+      });
+      $('dot').className = 'status-dot ok';
+      $('printBtn').disabled = false;
+    }
+  } catch(e) {
+    showToast('Scan failed: ' + e.message, 'error');
+  } finally {
+    $('scanBtn').disabled = false;
+    anim.endElement();
+  }
+});
+
+// --- Print ---
+$('printBtn').addEventListener('click', async () => {
+  const btn = $('printBtn');
+  const req = buildRequest();
+  req.printer = $('printerSelect').value || undefined;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Printing…';
+
+  try {
+    const resp = await fetch('/api/print', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(req),
+    });
+    const data = await resp.json();
+    showToast(data.message, data.success ? 'success' : 'error');
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Print Label';
+  }
+});
+
+// --- Helpers ---
+function buildRequest() {
+  const lines = [];
+  if (!imageMode) {
+    const l1 = $('line1').value.trim();
+    const l2 = $('line2').value.trim();
+    const l3 = $('line3').value.trim();
+    if (l1) lines.push(l1);
+    if (lineMode >= 2 && l2) lines.push(l2);
+    if (lineMode >= 3 && l3) lines.push(l3);
+  }
+  return {
+    lines,
+    image_url: imageMode ? $('imageUrl').value.trim() || undefined : undefined,
+    font: $('fontSelect').value,
+    weight: parseInt($('weightRange').value),
+    size: $('sizeInput').value ? parseFloat($('sizeInput').value) : undefined,
+    italic: $('italicCheck').checked,
+    invert: $('invertCheck').checked,
+  };
+}
+
+function hasContent(req) {
+  return (req.lines && req.lines.length > 0) || req.image_url;
+}
+
+function showToast(msg, type = '') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+</script>
+</body>
+</html>
