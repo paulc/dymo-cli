@@ -30,7 +30,7 @@ pub fn encode(image: &GrayImage) -> Vec<u8> {
 }
 
 /// Encode a single column (x) of the image into 4 bytes.
-/// Row 0 of the image → bit 7 of byte[3] (skipping physical row 0 via offset).
+/// Image row 0 → physical row 1 (skipping physical row 0) → bit 6 of byte[3].
 fn encode_column(image: &GrayImage, x: u32, h: u32) -> [u8; 4] {
     let mut bits: u32 = 0;
     let usable = h.min(PRINT_HEIGHT);
@@ -43,14 +43,14 @@ fn encode_column(image: &GrayImage, x: u32, h: u32) -> [u8; 4] {
         }
         let pixel = image.get_pixel(x, row)[0];
         if pixel < 128 {
-            // Black pixel → set bit. Row 0 → bit 31 (MSB of 32-bit word).
-            // print_row 1 → bit 30, etc.
-            bits |= 1 << (DATA_HEIGHT - 1 - print_row);
+            // Per spec: (col=0, row=0) → 00 00 00 80, i.e. bit 7 of the u32.
+            // Each byte holds 8 rows MSB-first: byte[3]=rows 0-7, byte[2]=rows 8-15, etc.
+            // Bit position for physical row r: 7 - (r%8) + 8*(r/8)
+            let bit = 7 - (print_row % 8) + 8 * (print_row / 8);
+            bits |= 1u32 << bit;
         }
     }
 
-    // Big-endian byte order matches [byte3, byte2, byte1, byte0] → [00 00 00 80] for (0,0)
-    // bits as u32 big-endian: MSB first
     bits.to_be_bytes()
 }
 
