@@ -55,7 +55,7 @@ struct PrintResult {
     message: String,
 }
 
-pub async fn serve(port: u16) -> Result<()> {
+pub async fn serve(port: u16, open: bool) -> Result<()> {
     let state = AppState {
         printers: Arc::new(Mutex::new(Vec::new())),
     };
@@ -72,10 +72,27 @@ pub async fn serve(port: u16) -> Result<()> {
         .await
         .map_err(|e| crate::error::Error::Web(e.to_string()))?;
 
-    println!("Web interface running at http://localhost:{}", port);
+    let url = format!("http://localhost:{}", port);
+    println!("Web interface running at {url}");
+
+    if open {
+        open_browser(&url);
+    }
+
     axum::serve(listener, app)
         .await
         .map_err(|e| crate::error::Error::Web(e.to_string()))
+}
+
+fn open_browser(url: &str) {
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("open").arg(url).spawn();
+
+    #[cfg(target_os = "linux")]
+    let _ = std::process::Command::new("xdg-open").arg(url).spawn();
+
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    let _ = url;
 }
 
 async fn index_handler() -> Html<&'static str> {

@@ -123,7 +123,7 @@ fn cmd_preview(cmd: cli::PreviewCmd) -> Result<()> {
 // ── web ───────────────────────────────────────────────────────────────────────
 
 async fn cmd_web(cmd: cli::WebCmd) -> Result<()> {
-    web::serve(cmd.port).await
+    web::serve(cmd.port, cmd.open).await
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────

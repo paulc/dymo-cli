@@ -119,4 +119,8 @@ pub struct WebCmd {
     /// port to listen on (default: 8080)
     #[argh(option, short = 'p', default = "8080")]
     pub port: u16,
+
+    /// open a browser to the server after starting
+    #[argh(switch)]
+    pub open: bool,
 }
