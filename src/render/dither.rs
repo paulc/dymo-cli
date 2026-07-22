@@ -1,6 +1,6 @@
 use image::{GrayImage, ImageBuffer, Luma};
 
-/// Floyd-Steinberg dithering → 1-bit (0 or 255).
+/// Floyd-Steinberg dithering -> 1-bit (0 or 255).
 pub fn floyd_steinberg(src: &GrayImage) -> GrayImage {
     let (w, h) = src.dimensions();
     let mut buf: Vec<f32> = src.pixels().map(|p| p[0] as f32).collect();

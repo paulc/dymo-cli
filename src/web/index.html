@@ -337,7 +337,7 @@
       <div class="printer-bar">
         <div class="status-dot" id="dot"></div>
         <select id="printerSelect">
-          <option value="">— scan for printers —</option>
+          <option value="">-- scan for printers --</option>
         </select>
         <button class="btn-icon" id="scanBtn" title="Scan for printers">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -370,7 +370,7 @@
 
       <div id="imageInput" style="display:none" class="field">
         <label>Image file path or URL</label>
-        <input type="text" id="imageUrl" placeholder="./logo.png or https://…">
+        <input type="text" id="imageUrl" placeholder="./logo.png or https://...">
       </div>
     </fieldset>
 
@@ -384,8 +384,6 @@
           <option value="roboto">Roboto</option>
           <option value="roboto-mono">Roboto Mono</option>
           <option value="routed-gothic">Routed Gothic</option>
-          <option value="routed-gothic-narrow">Routed Gothic Narrow</option>
-          <option value="routed-gothic-wide">Routed Gothic Wide</option>
         </select>
       </div>
 
@@ -408,6 +406,9 @@
       </label>
       <label class="checkbox-row">
         <input type="checkbox" id="invertCheck"> Invert (white on black)
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="noDitherCheck"> No dither (hard threshold)
       </label>
     </fieldset>
 
@@ -480,7 +481,7 @@ $('fontSelect').addEventListener('change', () => {
   $(id).addEventListener('input', schedulePreview);
 });
 
-['italicCheck','invertCheck'].forEach(id => {
+['italicCheck','invertCheck','noDitherCheck'].forEach(id => {
   $(id).addEventListener('change', schedulePreview);
 });
 
@@ -512,11 +513,11 @@ async function updatePreview() {
     const url = URL.createObjectURL(blob);
     const img = $('previewImg');
     img.onload = () => {
-      // naturalWidth / 8 = label pixel columns (before print 2× stretch)
-      // at 200 DPI with 2× stretch: effective mm = (cols * 2 / 200) * 25.4
+      // naturalWidth / 8 = label pixel columns (before print 2x stretch)
+      // at 200 DPI with 2x stretch: effective mm = (cols * 2 / 200) * 25.4
       const cols = img.naturalWidth / 8;
       const mm = ((cols * 2) / 200 * 25.4).toFixed(1);
-      $('labelDims').textContent = `≈ ${mm} mm × 12 mm`;
+      $('labelDims').textContent = `~ ${mm} mm x 12 mm`;
     };
     img.src = url;
     img.style.display = '';
@@ -564,7 +565,7 @@ $('printBtn').addEventListener('click', async () => {
   req.printer = $('printerSelect').value || undefined;
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Printing…';
+  btn.innerHTML = '<span class="spinner"></span>Printing...';
 
   try {
     const resp = await fetch('/api/print', {
@@ -601,6 +602,7 @@ function buildRequest() {
     size: $('sizeInput').value ? parseFloat($('sizeInput').value) : undefined,
     italic: $('italicCheck').checked,
     invert: $('invertCheck').checked,
+    no_dither: $('noDitherCheck').checked,
   };
 }
 

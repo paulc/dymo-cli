@@ -55,7 +55,7 @@ fn build_header(payload_len: u32) -> Vec<u8> {
     h
 }
 
-/// Split body into 500-byte chunks. Each chunk: [INDEX(1)] + [DATA(≤500)].
+/// Split body into 500-byte chunks. Each chunk: [INDEX(1)] + [DATA(<=500)].
 /// Final chunk: [INDEX(1)] + [DATA] + [12 34].
 fn chunk_body(body: &[u8]) -> Vec<Vec<u8>> {
     let mut chunks = Vec::new();

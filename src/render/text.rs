@@ -9,7 +9,7 @@ const MARGIN_Y: u32 = 1;
 
 const TAG_WGHT: [u8; 4] = *b"wght";
 
-/// Render 1–3 lines of text into a grayscale image of height PRINT_HEIGHT.
+/// Render 1-3 lines of text into a grayscale image of height PRINT_HEIGHT.
 ///
 /// `size` = desired cap-letter height in pixels per line (None = auto-fit to tape).
 /// The font is scaled so that capital letters (measured via 'H') fill that height,
@@ -21,7 +21,7 @@ pub fn render_text(
     weight: f32,
 ) -> Result<GrayImage> {
     if lines.is_empty() || lines.len() > 3 {
-        return Err(Error::Font("1–3 text lines required".into()));
+        return Err(Error::Font("1-3 text lines required".into()));
     }
 
     let mut font = FontVec::try_from_vec(font_data.to_vec())
@@ -36,7 +36,7 @@ pub fn render_text(
     let content_h = PRINT_HEIGHT.saturating_sub(MARGIN_Y * 2 + gap * (n - 1));
     let per_line_cap = size.unwrap_or((content_h / n) as f32);
 
-    // Scale font so the 'H' glyph bounding box height ≈ per_line_cap px.
+    // Scale font so the 'H' glyph bounding box height ~ per_line_cap px.
     let scale = cap_to_scale(&font, per_line_cap);
     let scaled = font.as_scaled(scale);
 
@@ -65,7 +65,7 @@ pub fn render_text(
     Ok(img)
 }
 
-// ── Font scaling helpers ──────────────────────────────────────────────────────
+// -- Font scaling helpers ------------------------------------------------------
 
 fn set_weight(font: &mut FontVec, weight: f32) {
     for axis in font.variations() {
@@ -88,15 +88,15 @@ fn glyph_cap_height<F: Font>(scaled: &PxScaleFont<F>) -> f32 {
     }
 }
 
-/// Return a PxScale whose 'H' glyph height ≈ desired_cap_px.
+/// Return a PxScale whose 'H' glyph height ~ desired_cap_px.
 fn cap_to_scale(font: &FontVec, desired_cap_px: f32) -> PxScale {
     let probe = PxScale::from(desired_cap_px);
     let cap = glyph_cap_height(&font.as_scaled(probe)).max(1.0);
-    // Cap height is proportional to scale: new_scale = desired² / cap_at_probe.
+    // Cap height is proportional to scale: new_scale = desired^2 / cap_at_probe.
     PxScale::from(desired_cap_px * desired_cap_px / cap)
 }
 
-// ── Drawing ───────────────────────────────────────────────────────────────────
+// -- Drawing -------------------------------------------------------------------
 
 fn measure_line<F: Font>(scaled: &PxScaleFont<F>, text: &str) -> u32 {
     let mut x = 0.0f32;

@@ -32,10 +32,10 @@ async fn run(args: Args) -> Result<()> {
     }
 }
 
-// ── scan ─────────────────────────────────────────────────────────────────────
+// -- scan ---------------------------------------------------------------------
 
 async fn cmd_scan(cmd: cli::ScanCmd) -> Result<()> {
-    println!("Scanning for Dymo printers ({} s)…", cmd.timeout);
+    println!("Scanning for Dymo printers ({} s)...", cmd.timeout);
     let printers = ble::scan(cmd.timeout).await?;
 
     if printers.is_empty() {
@@ -45,12 +45,12 @@ async fn cmd_scan(cmd: cli::ScanCmd) -> Result<()> {
 
     println!("\nFound {} printer(s):", printers.len());
     for (i, p) in printers.iter().enumerate() {
-        println!("  [{i}] {} — {}", p.name, p.address);
+        println!("  [{i}] {} - {}", p.name, p.address);
     }
     Ok(())
 }
 
-// ── print ─────────────────────────────────────────────────────────────────────
+// -- print ---------------------------------------------------------------------
 
 async fn cmd_print(cmd: cli::PrintCmd) -> Result<()> {
     let bitmap = build_bitmap_from_print_cmd(&cmd)?;
@@ -65,7 +65,7 @@ async fn cmd_print(cmd: cli::PrintCmd) -> Result<()> {
         Err(e) => return Err(e),
     };
 
-    print!("Printing… ");
+    print!("Printing... ");
     io::stdout().flush().ok();
     ble::print_image(&peripheral, &bitmap).await?;
     ble::disconnect(&peripheral).await;
@@ -87,7 +87,7 @@ fn build_bitmap_from_print_cmd(cmd: &cli::PrintCmd) -> Result<GrayImage> {
     Ok(render::to_print_bitmap(&raw, !cmd.no_dither))
 }
 
-// ── preview ──────────────────────────────────────────────────────────────────
+// -- preview ------------------------------------------------------------------
 
 fn cmd_preview(cmd: cli::PreviewCmd) -> Result<()> {
     let opts = make_render_opts(cmd.font.as_deref(), cmd.weight, cmd.size, cmd.italic, cmd.invert, cmd.no_dither);
@@ -115,18 +115,18 @@ fn cmd_preview(cmd: cli::PreviewCmd) -> Result<()> {
         io::stdout().write_all(buf.get_ref())?;
     } else {
         out.save_with_format(&cmd.output, image::ImageFormat::Png)?;
-        eprintln!("Saved '{}' ({}×{} px, {}× scale)", cmd.output, w * s, h * s, s);
+        eprintln!("Saved '{}' ({}x{} px, {}x scale)", cmd.output, w * s, h * s, s);
     }
     Ok(())
 }
 
-// ── web ───────────────────────────────────────────────────────────────────────
+// -- web -----------------------------------------------------------------------
 
 async fn cmd_web(cmd: cli::WebCmd) -> Result<()> {
     web::serve(cmd.port, cmd.open).await
 }
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// -- helpers ------------------------------------------------------------------
 
 fn make_render_opts(
     font: Option<&str>,
@@ -147,7 +147,7 @@ fn make_render_opts(
 
 fn validate_text(text: &[String]) -> Result<()> {
     if text.is_empty() {
-        return Err(Error::Font("provide 1–3 text arguments or --image".into()));
+        return Err(Error::Font("provide 1-3 text arguments or --image".into()));
     }
     if text.len() > 3 {
         return Err(Error::Font("maximum 3 text lines".into()));
@@ -158,9 +158,9 @@ fn validate_text(text: &[String]) -> Result<()> {
 fn prompt_select_printer(printers: &[ble::PrinterInfo]) -> Result<String> {
     println!("\nMultiple printers found:");
     for (i, p) in printers.iter().enumerate() {
-        println!("  [{i}] {} — {}", p.name, p.address);
+        println!("  [{i}] {} - {}", p.name, p.address);
     }
-    print!("Select printer [0–{}]: ", printers.len() - 1);
+    print!("Select printer [0-{}]: ", printers.len() - 1);
     io::stdout().flush().ok();
 
     let mut input = String::new();

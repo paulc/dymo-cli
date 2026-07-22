@@ -66,7 +66,7 @@ pub async fn connect(filter_addr: Option<&str>) -> Result<Peripheral> {
         printers.into_iter().next().unwrap()
     } else {
         return Err(Error::PrintFailed(
-            "multiple printers found — use --printer <address>".into(),
+            "multiple printers found - use --printer <address>".into(),
         ));
     };
 

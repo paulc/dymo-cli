@@ -12,7 +12,7 @@ pub use encode::PRINT_HEIGHT;
 #[derive(Clone, Debug)]
 pub struct RenderOptions {
     pub font: Option<String>,
-    /// Variable font weight axis (100–900).
+    /// Variable font weight axis (100-900).
     pub weight: f32,
     /// Cap-letter height per line in pixels. None = auto-fit to tape height.
     pub size: Option<f32>,
@@ -32,7 +32,7 @@ impl Default for RenderOptions {
     }
 }
 
-/// Render text lines → smooth grayscale (for preview or print pipeline).
+/// Render text lines -> smooth grayscale (for preview or print pipeline).
 pub fn render_text_lines(lines: &[&str], opts: &RenderOptions) -> Result<GrayImage> {
     let font_name = opts.font.as_deref().unwrap_or("roboto");
     let font_data: FontData = crate::fonts::resolve(font_name, opts.italic)?;
@@ -43,19 +43,19 @@ pub fn render_text_lines(lines: &[&str], opts: &RenderOptions) -> Result<GrayIma
     Ok(img)
 }
 
-/// Load an image source (path or URL) → smooth grayscale scaled to PRINT_HEIGHT.
+/// Load an image source (path or URL) -> smooth grayscale scaled to PRINT_HEIGHT.
 pub fn render_image_smooth(source: &str) -> Result<GrayImage> {
     let dyn_img = load_image(source)?;
     Ok(scale_to_print_height(dyn_img))
 }
 
-/// Load an image source → dithered 1-bit grayscale scaled to PRINT_HEIGHT.
+/// Load an image source -> dithered 1-bit grayscale scaled to PRINT_HEIGHT.
 pub fn render_image(source: &str) -> Result<GrayImage> {
     let gray = render_image_smooth(source)?;
     Ok(dither::floyd_steinberg(&gray))
 }
 
-/// Convert a smooth grayscale image → print-ready 1-bit, padded to PRINT_HEIGHT.
+/// Convert a smooth grayscale image -> print-ready 1-bit, padded to PRINT_HEIGHT.
 /// Pass `dither = true` for Floyd-Steinberg, `false` for a hard mid-point threshold.
 pub fn to_print_bitmap(img: &GrayImage, dither: bool) -> GrayImage {
     let padded = pad_to_height(img);
@@ -80,7 +80,7 @@ pub fn pad_to_height(img: &GrayImage) -> GrayImage {
 }
 
 
-// ── Private helpers ──────────────────────────────────────────────────────────
+// -- Private helpers ----------------------------------------------------------
 
 fn load_image(source: &str) -> Result<DynamicImage> {
     if source.starts_with("http://") || source.starts_with("https://") {

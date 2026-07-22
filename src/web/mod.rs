@@ -17,7 +17,7 @@ use crate::render::{self, RenderOptions, PRINT_HEIGHT};
 static INDEX_HTML: &str = include_str!("index.html");
 
 // How much to enlarge the preview image for display in the browser.
-// The label is ~30px tall; 8× gives ~240px which is comfortably readable.
+// The label is ~30px tall; 8x gives ~240px which is comfortably readable.
 const PREVIEW_SCALE: u32 = 8;
 
 #[derive(Clone)]
@@ -123,7 +123,7 @@ async fn preview_handler(Json(req): Json<RenderRequest>) -> Response {
         Err(e) => return (StatusCode::BAD_REQUEST, e.to_string()).into_response(),
     };
 
-    // Scale up uniformly — the natural W×30 proportions are preserved and the
+    // Scale up uniformly - the natural Wx30 proportions are preserved and the
     // label will appear as a wide thin strip for typical content.
     let s = PREVIEW_SCALE;
     let (w, h) = smooth.dimensions();
@@ -157,9 +157,9 @@ async fn print_handler(Json(req): Json<RenderRequest>) -> Json<PrintResult> {
     }
 }
 
-// ── Bitmap helpers ────────────────────────────────────────────────────────────
+// -- Bitmap helpers ------------------------------------------------------------
 
-/// Smooth grayscale (no dithering) — for browser preview.
+/// Smooth grayscale (no dithering) - for browser preview.
 fn make_smooth_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
     let opts = render_opts(req);
     let raw = if let Some(url) = &req.image_url {
@@ -174,7 +174,7 @@ fn make_smooth_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
     Ok(render::pad_to_height(&raw))
 }
 
-/// 1-bit — for sending to the printer.
+/// 1-bit - for sending to the printer.
 fn make_print_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
     let opts = render_opts(req);
     let raw = if let Some(url) = &req.image_url {

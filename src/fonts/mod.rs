@@ -6,8 +6,6 @@ static ROBOTO_ITALIC:      &[u8] = include_bytes!("../../assets/fonts/Roboto-Ita
 static ROBOTO_MONO:        &[u8] = include_bytes!("../../assets/fonts/RobotoMono[wght].ttf");
 static ROBOTO_MONO_ITALIC: &[u8] = include_bytes!("../../assets/fonts/RobotoMono-Italic[wght].ttf");
 static ROUTED_GOTHIC:      &[u8] = include_bytes!("../../assets/fonts/routed-gothic.ttf");
-static ROUTED_GOTHIC_NARROW: &[u8] = include_bytes!("../../assets/fonts/routed-gothic-narrow.ttf");
-static ROUTED_GOTHIC_WIDE:   &[u8] = include_bytes!("../../assets/fonts/routed-gothic-wide.ttf");
 
 pub enum FontData {
     Static(&'static [u8]),
@@ -44,13 +42,9 @@ pub fn resolve(name: &str, italic: bool) -> Result<FontData> {
             if italic { ROBOTO_MONO_ITALIC } else { ROBOTO_MONO }
         }
         "routed-gothic" | "routed gothic" => ROUTED_GOTHIC,
-        "routed-gothic-narrow" | "routed gothic narrow" => ROUTED_GOTHIC_NARROW,
-        "routed-gothic-wide"   | "routed gothic wide"   => ROUTED_GOTHIC_WIDE,
         _ => return Err(Error::Font(format!(
-            "unknown font '{}'. Built-in fonts: roboto, roboto-mono, routed-gothic, \
-             routed-gothic-narrow, routed-gothic-wide", name
+            "unknown font '{}'. Built-in fonts: roboto, roboto-mono, routed-gothic", name
         ))),
     };
     Ok(FontData::Static(data))
 }
-

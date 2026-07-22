@@ -29,7 +29,7 @@ pub struct ScanCmd {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "print")]
 pub struct PrintCmd {
-    /// text to print — 1, 2, or 3 positional arguments for 1/2/3 lines
+    /// text to print - 1, 2, or 3 positional arguments for 1/2/3 lines
     #[argh(positional)]
     pub text: Vec<String>,
 
@@ -37,12 +37,11 @@ pub struct PrintCmd {
     #[argh(option)]
     pub image: Option<String>,
 
-    /// font: roboto (default), roboto-mono, routed-gothic,
-    ///       routed-gothic-narrow, routed-gothic-wide, or a path/URL to a TTF
+    /// font: roboto (default), roboto-mono, routed-gothic, or a path/URL to a TTF
     #[argh(option, short = 'f')]
     pub font: Option<String>,
 
-    /// font weight 100–900 (default: 400). Ignored for Routed Gothic.
+    /// font weight 100-900 (default: 400). Ignored for Routed Gothic.
     #[argh(option, short = 'w', default = "400")]
     pub weight: u32,
 
@@ -62,7 +61,7 @@ pub struct PrintCmd {
     #[argh(switch)]
     pub no_dither: bool,
 
-    /// printer BLE address — auto-selected if only one printer is visible
+    /// printer BLE address - auto-selected if only one printer is visible
     #[argh(option, short = 'p')]
     pub printer: Option<String>,
 }
@@ -71,7 +70,7 @@ pub struct PrintCmd {
 #[derive(FromArgs)]
 #[argh(subcommand, name = "preview")]
 pub struct PreviewCmd {
-    /// text to render — 1, 2, or 3 positional arguments
+    /// text to render - 1, 2, or 3 positional arguments
     #[argh(positional)]
     pub text: Vec<String>,
 
@@ -83,7 +82,7 @@ pub struct PreviewCmd {
     #[argh(option, short = 'f')]
     pub font: Option<String>,
 
-    /// font weight 100–900 (default: 400)
+    /// font weight 100-900 (default: 400)
     #[argh(option, short = 'w', default = "400")]
     pub weight: u32,
 
