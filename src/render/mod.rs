@@ -14,7 +14,7 @@ pub struct RenderOptions {
     pub font: Option<String>,
     /// Variable font weight axis (100–900).
     pub weight: f32,
-    /// Explicit pixel size. None = auto-fit.
+    /// Cap-letter height per line in pixels. None = auto-fit to tape height.
     pub size: Option<f32>,
     pub italic: bool,
     pub invert: bool,
@@ -55,10 +55,11 @@ pub fn render_image(source: &str) -> Result<GrayImage> {
     Ok(dither::floyd_steinberg(&gray))
 }
 
-/// Convert a smooth grayscale image → print-ready 1-bit (dithered), padded to PRINT_HEIGHT.
-pub fn to_print_bitmap(img: &GrayImage) -> GrayImage {
+/// Convert a smooth grayscale image → print-ready 1-bit, padded to PRINT_HEIGHT.
+/// Pass `dither = true` for Floyd-Steinberg, `false` for a hard mid-point threshold.
+pub fn to_print_bitmap(img: &GrayImage, dither: bool) -> GrayImage {
     let padded = pad_to_height(img);
-    dither::floyd_steinberg(&padded)
+    if dither { dither::floyd_steinberg(&padded) } else { threshold(&padded) }
 }
 
 /// Pad/crop a grayscale image to exactly PRINT_HEIGHT rows, centred vertically.
@@ -78,10 +79,6 @@ pub fn pad_to_height(img: &GrayImage) -> GrayImage {
     out
 }
 
-/// Legacy alias used by CLI preview/print paths.
-pub fn to_label_bitmap(img: &GrayImage) -> GrayImage {
-    to_print_bitmap(img)
-}
 
 // ── Private helpers ──────────────────────────────────────────────────────────
 
@@ -105,4 +102,10 @@ fn invert_image(img: &mut GrayImage) {
     for p in img.pixels_mut() {
         p[0] = 255 - p[0];
     }
+}
+
+fn threshold(img: &GrayImage) -> GrayImage {
+    ImageBuffer::from_fn(img.width(), img.height(), |x, y| {
+        Luma([if img.get_pixel(x, y)[0] < 128 { 0u8 } else { 255u8 }])
+    })
 }

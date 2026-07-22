@@ -58,6 +58,10 @@ pub struct PrintCmd {
     #[argh(switch)]
     pub invert: bool,
 
+    /// disable Floyd-Steinberg dithering (use hard threshold instead)
+    #[argh(switch)]
+    pub no_dither: bool,
+
     /// printer BLE address — auto-selected if only one printer is visible
     #[argh(option, short = 'p')]
     pub printer: Option<String>,
@@ -95,7 +99,11 @@ pub struct PreviewCmd {
     #[argh(switch)]
     pub invert: bool,
 
-    /// output PNG path (default: label.png)
+    /// disable Floyd-Steinberg dithering (use hard threshold instead)
+    #[argh(switch)]
+    pub no_dither: bool,
+
+    /// output PNG path (default: label.png); use - for stdout
     #[argh(option, short = 'o', default = "String::from(\"label.png\")")]
     pub output: String,
 

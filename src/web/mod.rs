@@ -34,6 +34,7 @@ struct RenderRequest {
     size: Option<f32>,
     italic: Option<bool>,
     invert: Option<bool>,
+    no_dither: Option<bool>,
     printer: Option<String>,
 }
 
@@ -156,7 +157,7 @@ fn make_smooth_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
     Ok(render::pad_to_height(&raw))
 }
 
-/// Dithered 1-bit — for sending to the printer.
+/// 1-bit — for sending to the printer.
 fn make_print_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
     let opts = render_opts(req);
     let raw = if let Some(url) = &req.image_url {
@@ -168,7 +169,8 @@ fn make_print_bitmap(req: &RenderRequest) -> crate::error::Result<GrayImage> {
         }
         render::render_text_lines(&refs, &opts)?
     };
-    Ok(render::to_print_bitmap(&raw))
+    let dither = !req.no_dither.unwrap_or(false);
+    Ok(render::to_print_bitmap(&raw, dither))
 }
 
 fn render_opts(req: &RenderRequest) -> RenderOptions {

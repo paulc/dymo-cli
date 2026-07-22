@@ -74,7 +74,7 @@ async fn cmd_print(cmd: cli::PrintCmd) -> Result<()> {
 }
 
 fn build_bitmap_from_print_cmd(cmd: &cli::PrintCmd) -> Result<GrayImage> {
-    let opts = make_render_opts(cmd.font.as_deref(), cmd.weight, cmd.size, cmd.italic, cmd.invert);
+    let opts = make_render_opts(cmd.font.as_deref(), cmd.weight, cmd.size, cmd.italic, cmd.invert, cmd.no_dither);
 
     let raw = if let Some(src) = &cmd.image {
         render::render_image(src)?
@@ -84,13 +84,13 @@ fn build_bitmap_from_print_cmd(cmd: &cli::PrintCmd) -> Result<GrayImage> {
         render::render_text_lines(&refs, &opts)?
     };
 
-    Ok(render::to_label_bitmap(&raw))
+    Ok(render::to_print_bitmap(&raw, !cmd.no_dither))
 }
 
 // ── preview ──────────────────────────────────────────────────────────────────
 
 fn cmd_preview(cmd: cli::PreviewCmd) -> Result<()> {
-    let opts = make_render_opts(cmd.font.as_deref(), cmd.weight, cmd.size, cmd.italic, cmd.invert);
+    let opts = make_render_opts(cmd.font.as_deref(), cmd.weight, cmd.size, cmd.italic, cmd.invert, cmd.no_dither);
 
     let raw = if let Some(src) = &cmd.image {
         render::render_image(src)?
@@ -100,16 +100,23 @@ fn cmd_preview(cmd: cli::PreviewCmd) -> Result<()> {
         render::render_text_lines(&refs, &opts)?
     };
 
-    let bitmap = render::to_label_bitmap(&raw);
+    let bitmap = render::to_print_bitmap(&raw, !cmd.no_dither);
 
     let s = cmd.scale.max(1);
     let (w, h) = bitmap.dimensions();
-    let scaled: GrayImage = ImageBuffer::from_fn(w * s, h * s, |x, y| {
+    let out: GrayImage = ImageBuffer::from_fn(w * s, h * s, |x, y| {
         *bitmap.get_pixel(x / s, y / s)
     });
 
-    scaled.save(&cmd.output)?;
-    println!("Saved '{}' ({}×{} px, {}× scale)", cmd.output, w * s, h * s, s);
+    if cmd.output == "-" {
+        let mut buf = std::io::Cursor::new(Vec::<u8>::new());
+        out.write_to(&mut buf, image::ImageFormat::Png)?;
+        use std::io::Write;
+        io::stdout().write_all(buf.get_ref())?;
+    } else {
+        out.save_with_format(&cmd.output, image::ImageFormat::Png)?;
+        eprintln!("Saved '{}' ({}×{} px, {}× scale)", cmd.output, w * s, h * s, s);
+    }
     Ok(())
 }
 
@@ -127,6 +134,7 @@ fn make_render_opts(
     size: Option<f32>,
     italic: bool,
     invert: bool,
+    _no_dither: bool,
 ) -> RenderOptions {
     RenderOptions {
         font: font.map(str::to_owned),
